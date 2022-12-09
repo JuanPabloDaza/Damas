@@ -6,4 +6,5 @@ public class DamasException extends Exception{
     }
 
     public static final String MOVIMIENTO_INVALIDO = "Movimiento invalido.";
+    public static final String INVENTARIO_VACIO = "El inventario esta vacio.";
 }

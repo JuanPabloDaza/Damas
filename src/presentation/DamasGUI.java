@@ -326,18 +326,22 @@ public class DamasGUI extends JFrame {
         if (logica.getJugador() == "Blanca") {
             inventarioActual = inventarioBlanco;
         }
+        else {
+            inventarioActual = inventarioNegro;
+        }
     }
     private void accionInventario() {
-        int n = JOptionPane.showOptionDialog(null,
-                "Inventario",
-                "Inventario ",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                inventarioActual,
-                inventarioActual[0]);
-        if (inventarioNegro == null) {
-            System.out.println("El inventario es vacio");;
+        try {
+            int n = JOptionPane.showOptionDialog(null,
+                    "Inventario",
+                    "Inventario ",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    inventarioActual,
+                    inventarioActual[0]);
+        }catch (Exception e ){
+            JOptionPane.showMessageDialog(null,"Inventario Vacio","Damas",JOptionPane.ERROR_MESSAGE);
         }
     }
     private void accionNuevaFicha(){
