@@ -13,8 +13,6 @@ public class Damas {
     private Ficha[][] tablero = new Ficha[10][10];
     private Casillas[][] tableroCasillas = new Casillas[10][10];
     private Comodin[][] tableroComodin = new Comodin[10][10];
-    private ArrayList<Ficha> fichasB = new ArrayList<>();
-    private ArrayList<Ficha> fichasN = new ArrayList<>();
     private boolean victoria = false;
     private int[][] movimiento = new int[2][2];
     private boolean nuevaFicha = false;
