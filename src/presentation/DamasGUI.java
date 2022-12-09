@@ -20,6 +20,9 @@ public class DamasGUI extends JFrame {
     private int[][] movimiento = new int[2][2];
     private Icon fichaNormalNegra = new ImageIcon("Ficha_Normal_Negro.png");
     private Icon fichaNormalBlanca = new ImageIcon("Ficha_Normal_Blanca.png");
+    private Icon casillaMinaIcono = new ImageIcon("Mine.png");
+    private Icon comodinGunIcono = new ImageIcon("Gun.png");
+    private Icon comodinStompIcono = new ImageIcon("Stomp.png");
     private Icon fichaReinaNegra = new ImageIcon("ficha_Reina_Negra.png");
     private Icon fichaReinaBlanca = new ImageIcon("ficha_Reina_Blanca.png");
     private Object[] opciones = {fichaReinaNegra};
@@ -229,6 +232,14 @@ public class DamasGUI extends JFrame {
         if(logica.getNuevaFicha()){
             accionNuevaFicha();
         }
+        if(logica.getCasilla()){
+            accionNuevaCasilla();
+        } else if (logica.getComodin()) {
+            accionNuevoComodin();
+        }
+        if(logica.getMine()){
+            accionMina();
+        }
 
         turno.setVisible(false);
         turno = new JLabel("Turno: "+ Integer.toString(logica.getTurno()));
@@ -241,8 +252,40 @@ public class DamasGUI extends JFrame {
         jugador.setVisible(true);
     }
 
+    private void accionNuevaCasilla(){
+        int[] posicion = logica.getPosicionCasilla();
+        if(logica.getTipoCasilla().equals("Mine")){
+            malla[posicion[0]][posicion[1]].setIcon(casillaMinaIcono);
+            malla[posicion[0]][posicion[1]].repaint();
+        }
+    }
+
+    private void accionNuevoComodin(){
+        int[] posicion = logica.getPosicionComodin();
+        if(logica.getTipoComodin().equals("Gun")){
+            malla[posicion[0]][posicion[1]].setIcon(comodinGunIcono);
+            malla[posicion[0]][posicion[1]].repaint();
+        } else if (logica.getTipoComodin().equals("Stomp")) {
+            malla[posicion[0]][posicion[1]].setIcon(comodinStompIcono);
+            malla[posicion[0]][posicion[1]].repaint();
+        }
+    }
+
+    private void accionMina(){
+        for(int i = movimiento[1][0]-1; i < movimiento[1][0]+2; i++){
+            for(int j = movimiento[1][1] - 1; j < movimiento[1][1] + 2; j++){
+                try{
+                    malla[i][j].setIcon(null);
+                    malla[i][j].repaint();
+                }catch (Exception e){
+
+                }
+            }
+        }
+    }
+
     private void accionVictoria(){
-        int output = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getJugador() + " acaba de ganar.", "Victoria", JOptionPane.DEFAULT_OPTION);
+        int output = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getNombreJugador(logica.getJugador()) + " acaba de ganar.", "Victoria", JOptionPane.DEFAULT_OPTION);
     }
 
     private void accionCaptura(){
