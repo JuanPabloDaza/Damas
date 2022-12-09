@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Jugador {
     private String color;
     private String name;
-    private ArrayList<Comodin> inventario;
+    private ArrayList<Comodin> inventario = new ArrayList<>();
     private ArrayList<Ficha> fichas = new ArrayList<>();
 
     public Jugador(String color){

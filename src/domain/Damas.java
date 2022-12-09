@@ -7,11 +7,14 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class Damas {
     private Timer timer;
     JLabel timeLabel;
     private Ficha[][] tablero = new Ficha[10][10];
+    private Casillas[][] tableroCasillas = new Casillas[10][10];
+    private Comodin[][] tableroComodin = new Comodin[10][10];
     private ArrayList<Ficha> fichasB = new ArrayList<>();
     private ArrayList<Ficha> fichasN = new ArrayList<>();
     private boolean victoria = false;
@@ -19,7 +22,14 @@ public class Damas {
     private boolean nuevaFicha = false;
 
     private boolean captura = false;
+    private boolean comodin = false;
+    private int[] posicionComodin = new int[2];
+    private String tipoComodin;
+    private boolean casilla = false;
+    private int[] posicionCasilla = new int[2];
+    private boolean mine = false;
 
+    private String tipoCasilla;
     private String jugador = "Negro";
     private HashMap<String,Jugador> jugadores = new HashMap<>();
     private int turno = 1;
@@ -68,6 +78,7 @@ public class Damas {
             movimiento[1][0] = fila;
             movimiento[1][1] = columna;
             nuevaFicha = false;
+            reiniciarComodines();
             reiniciarCaptura();
             validarMovimiento();
         }
@@ -77,7 +88,7 @@ public class Damas {
         if(tablero[movimiento[0][0]][movimiento[0][1]] == null){
             reiniciarMovimiento();
             throw new DamasException(DamasException.MOVIMIENTO_INVALIDO);
-        } else if (tablero[movimiento[1][0]][movimiento[1][1]] instanceof Ficha) {
+        } else if (tablero[movimiento[1][0]][movimiento[1][1]] != null) {
             reiniciarMovimiento();
             throw new DamasException(DamasException.MOVIMIENTO_INVALIDO);
         }else {
@@ -221,6 +232,11 @@ public class Damas {
 
 
     private void finalizarMovimiento(){
+        if(tableroComodin[movimiento[1][0]][movimiento[1][1]] != null){
+            accionComodin();
+        } else if (tableroCasillas[movimiento[1][0]][movimiento[1][1]] != null) {
+            accionCasilla();
+        }
         tablero[movimiento[1][0]][movimiento[1][1]] = tablero[movimiento[0][0]][movimiento[0][1]];
         tablero[movimiento[0][0]][movimiento[0][1]] = null;
         reiniciarMovimiento();
@@ -234,6 +250,50 @@ public class Damas {
         }
     }
 
+    private void accionComodin(){
+        jugadores.get(jugador).agregarComodin(tableroComodin[movimiento[1][0]][movimiento[1][1]]);
+        tableroComodin[movimiento[1][0]][movimiento[1][1]] = null;
+    }
+
+    private void accionCasilla(){
+        if(tableroCasillas[movimiento[1][0]][movimiento[1][1]] instanceof Mine){
+            accionMina();
+        }else if(tableroCasillas[movimiento[1][0]][movimiento[1][1]] instanceof Teleport){
+            accionTeleport();
+        } else if (tableroCasillas[movimiento[1][0]][movimiento[1][1]] instanceof Jail) {
+            accionJail();
+        }
+    }
+
+    private void accionMina(){
+        tableroCasillas[movimiento[1][0]][movimiento[1][1]] = null;
+        tablero[movimiento[0][0]][movimiento[0][1]] = null;
+        for(int i = movimiento[1][0]-1; i < movimiento[1][0]+2; i++){
+            for(int j = movimiento[1][1] - 1; j < movimiento[1][1]+2; j++){
+                try{
+                    if(tablero[i][j] != null){
+                        if(tablero[i][j].getColor().equals("Negro")){
+                            jugadores.get("Negro").quitarFicha(tablero[i][j]);
+                            tablero[i][j] = null;
+                        }else{
+                            jugadores.get("Blanco").quitarFicha(tablero[i][j]);
+                            tablero[i][j] = null;
+                        }
+                        mine = true;
+                    }
+                }catch (Exception e){
+
+                }
+            }
+        }
+    }
+
+    private void accionTeleport(){
+
+    }
+    private void accionJail(){
+
+    }
     private void capturarFicha() throws DamasException{
         if(movimiento[1][0] > movimiento[0][0]){
             if(movimiento[1][1] > movimiento[0][1]) {
@@ -383,6 +443,91 @@ public class Damas {
         }else{
             jugador = "Negro";
         }
+        if(turno % 5 == 0){
+            int numero = (int)(Math.random()*(2));
+            if(numero == 0){
+                agregarCasilla();
+            }else{
+                agregarComodin();
+            }
+        }
         turno += 1;
+    }
+
+    private void agregarCasilla(){
+        boolean put = false;
+        int tipo = (int)(Math.random()*(1));
+        int i = (int)(Math.random()*(10));
+        int j = (int)(Math.random()*(10));
+        while (!put){
+            if ((i + j) % 2 != 0 && !(i == movimiento[1][0] && j == movimiento[1][1])) {
+                if(tablero[i][j] == null){
+                    if(tipo == 0){
+                        tableroCasillas[i][j] = new Mine(i,j);
+                        put = true;
+                        tipoCasilla = "Mine";
+                    }
+                    casilla = true;
+                    posicionCasilla[0] = i;
+                    posicionCasilla[1] = j;
+                }
+            }
+            i = (int)(Math.random()*(10));
+            j = (int)(Math.random()*(10));
+        }
+    }
+    private void agregarComodin(){
+        boolean put = false;
+        int tipo = (int)(Math.random()*(2));
+        int i = (int)(Math.random()*(10));
+        int j = (int)(Math.random()*(10));
+        while (!put){
+            if ((i + j) % 2 != 0 && !(i == movimiento[1][0] && j == movimiento[1][1]) ) {
+                if(tablero[i][j] == null){
+                    if(tipo == 0){
+                        tableroComodin[i][j] = new Gun(i,j);
+                        put = true;
+                        tipoComodin = "Gun";
+                    }else if(tipo == 1){
+                        tableroComodin[i][j] = new Stomp(i,j);
+                        put = true;
+                        tipoComodin = "Stomp";
+                    }
+                    comodin = true;
+                    posicionComodin[0] = i;
+                    posicionComodin[1] = j;
+                }
+            }
+            i = (int)(Math.random()*(10));
+            j = (int)(Math.random()*(10));
+        }
+    }
+
+    private void reiniciarComodines(){
+        casilla = false;
+        comodin = false;
+        mine = false;
+    }
+    public boolean getCasilla() {
+        return casilla;
+    }
+    public boolean getComodin(){
+        return comodin;
+    }
+    public int[] getPosicionCasilla(){
+        return posicionCasilla;
+    }
+    public int[] getPosicionComodin(){
+        return posicionComodin;
+    }
+
+    public String getTipoCasilla() {
+        return tipoCasilla;
+    }
+    public String getTipoComodin(){
+        return tipoComodin;
+    }
+    public boolean getMine(){
+        return mine;
     }
 }
