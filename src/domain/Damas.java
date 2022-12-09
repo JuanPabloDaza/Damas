@@ -2,12 +2,10 @@ package domain;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
+
 
 public class Damas {
     private Timer timer;
@@ -37,11 +35,16 @@ public class Damas {
     private String ddSecond, ddMinute;
     private int hora,minuto,segundo;
 
+    /*
+    Constructor para los objetos de tipo Damas.
+    * */
     public Damas(){
         crearTablero();
         reiniciarMovimiento();
     }
-
+    /*
+    Funcion para crear el tablero del juego como una matriz.
+    * */
     private void crearTablero(){
         jugadores.put("Negro",new Jugador("Negro"));
         jugadores.put("Blanco", new Jugador("Blanco"));
@@ -61,7 +64,9 @@ public class Damas {
             }
         }
     }
-
+    /*
+    Funcion para agregar un jugador al juego.
+    * */
     public void agregarJugador(int i, String nombre){
         if(i == 1){
             jugadores.get("Negro").cambiarNombre(nombre);
@@ -69,7 +74,9 @@ public class Damas {
             jugadores.get("Blanco").cambiarNombre(nombre);
         }
     }
-
+    /*
+    Funcion para realizar un movimiento en el tablero.
+    * */
     public void realizarMovimiento(int fila, int columna) throws DamasException{
         if(movimiento[0][0] == -1){
             movimiento[0][0] = fila;
@@ -83,7 +90,9 @@ public class Damas {
             validarMovimiento();
         }
     }
-
+    /*
+    Funcion para validar el movimiento de una ficha.
+    * */
     private void validarMovimiento() throws DamasException{
         if(tablero[movimiento[0][0]][movimiento[0][1]] == null){
             reiniciarMovimiento();
@@ -104,8 +113,11 @@ public class Damas {
             }
         }
     }
-
+    /*
+    Funcion para validar el movimiento de una ficha tipo Reina.
+    * */
     private void validarMovimientoFichaReina() throws DamasException{
+        movimientoFichaReinaDiagonal();
         boolean in = false;
         if(movimiento[1][0] > movimiento[0][0]){
             if(movimiento[1][1] > movimiento[0][1]){
@@ -196,7 +208,70 @@ public class Damas {
             finalizarMovimiento();
         }
     }
-
+    /*
+    Funcion para validar que el movimiento de la ficha tipo reina se realice en una de sus diagonales.
+    * */
+    private void movimientoFichaReinaDiagonal() throws DamasException{
+        int col = movimiento[0][1];
+        int fila = movimiento[0][0];
+        boolean valid = false;
+        if(movimiento[1][0] > movimiento[0][0]){
+            if(movimiento[1][1] > movimiento[0][1]){
+                while(col < movimiento[1][1] +1  || fila < movimiento[1][0] + 1){
+                    if(col == movimiento[1][1] && fila == movimiento[1][0]){
+                        valid = true;
+                        col = movimiento[1][1] +1;
+                        fila = movimiento[1][0] + 1;
+                    }else {
+                        col += 1;
+                        fila += 1;
+                    }
+                }
+            }else{
+                while(col > movimiento[1][1] -1  || fila < movimiento[1][0] + 1){
+                    if(col == movimiento[1][1] && fila == movimiento[1][0]){
+                        valid = true;
+                        col = movimiento[1][1] -1;
+                        fila = movimiento[1][0] + 1;
+                    }else {
+                        col -= 1;
+                        fila += 1;
+                    }
+                }
+            }
+        }else {
+            if (movimiento[1][1] > movimiento[0][1]) {
+                while (col < movimiento[1][1] + 1 || fila > movimiento[1][0] - 1) {
+                    if (col == movimiento[1][1] && fila == movimiento[1][0]) {
+                        valid = true;
+                        col = movimiento[1][1] + 1;
+                        fila = movimiento[1][0] - 1;
+                    } else {
+                        col += 1;
+                        fila -= 1;
+                    }
+                }
+            } else {
+                while (col > movimiento[1][1] - 1 || fila > movimiento[1][0] - 1) {
+                    if (col == movimiento[1][1] && fila == movimiento[1][0]) {
+                        valid = true;
+                        col = movimiento[1][1] - 1;
+                        fila = movimiento[1][0] - 1;
+                    } else {
+                        col -= 1;
+                        fila -= 1;
+                    }
+                }
+            }
+        }
+        if (!valid) {
+            reiniciarMovimiento();
+            throw new DamasException(DamasException.MOVIMIENTO_INVALIDO);
+        }
+    }
+    /*
+    Funcion para validar el movimeinto de una ficha tipo normal
+    * */
     private void validarMovimientoFichaNormal() throws DamasException{
         if((tablero[movimiento[0][0]][movimiento[0][1]].getColor().equals("Negro") && movimiento[1][0] > movimiento[0][0]) || (tablero[movimiento[0][0]][movimiento[0][1]].getColor().equals("Blanco") && movimiento[1][0] < movimiento[0][0])) {
             if (movimiento[1][0] > movimiento[0][0] + 1 || movimiento[1][0] < movimiento[0][0] - 1) {//Moviento es mas de una casilla, validar si come ficha o es invalido
@@ -228,9 +303,9 @@ public class Damas {
             throw new DamasException(DamasException.MOVIMIENTO_INVALIDO);
         }
     }
-
-
-
+    /*
+    Funcion para finalizar un movimiento luego de ser validado
+    * */
     private void finalizarMovimiento(){
         if(tableroComodin[movimiento[1][0]][movimiento[1][1]] != null){
             accionComodin();
@@ -249,12 +324,16 @@ public class Damas {
             siguienteTurno();
         }
     }
-
+    /*
+    Funcion para darle el comodin correspondiente al jugador.
+    * */
     private void accionComodin(){
         jugadores.get(jugador).agregarComodin(tableroComodin[movimiento[1][0]][movimiento[1][1]]);
         tableroComodin[movimiento[1][0]][movimiento[1][1]] = null;
     }
-
+    /*
+    Funcion para realizar la accion de la casilla correspondiente.
+    * */
     private void accionCasilla(){
         if(tableroCasillas[movimiento[1][0]][movimiento[1][1]] instanceof Mine){
             accionMina();
@@ -264,7 +343,9 @@ public class Damas {
             accionJail();
         }
     }
-
+    /*
+    Funcion para realizar la accion de una casilla tipo mina.
+    * */
     private void accionMina(){
         tableroCasillas[movimiento[1][0]][movimiento[1][1]] = null;
         tablero[movimiento[0][0]][movimiento[0][1]] = null;
@@ -287,13 +368,21 @@ public class Damas {
             }
         }
     }
-
+    /*
+    Funcion para realizar la accion de una casilla tipo teleport.
+    * */
     private void accionTeleport(){
 
     }
+    /*
+    Funcion para realizar la accion de una casilla tipo Jail.
+    * */
     private void accionJail(){
 
     }
+    /*
+    Funcion para realizar la accion al capturar una ficha.
+    * */
     private void capturarFicha() throws DamasException{
         if(movimiento[1][0] > movimiento[0][0]){
             if(movimiento[1][1] > movimiento[0][1]) {
@@ -366,10 +455,9 @@ public class Damas {
             }
         }
     }
-    private void capturaPosible(){
-
-    }
-
+    /*
+    Funcion para realizar la accion de cambiar una ficha por otra.
+    * */
     public void cambiarFicha(int i){
         if(jugador.equals("Negro")){
             jugadores.get("Blanco").quitarFicha(tablero[movimiento[1][0]][movimiento[1][1]]);
@@ -387,7 +475,9 @@ public class Damas {
             }
         }
     }
-
+    /*
+    Funcion para hacerle saber al GUI que se realizo un cambio de ficha.
+    * */
     private void validarCambioFicha(){
         if(tablero[movimiento[1][0]][movimiento[1][1]].getColor().equals("Negro")){
             if(movimiento[1][0] == 9){
@@ -399,6 +489,9 @@ public class Damas {
             }
         }
     }
+    /*
+    Funcion para determinar que jugador obtiene la victoria.
+    * */
     private boolean victoria(){
         if(jugadores.get("Negro").getNumeroFichas() < 1 || jugadores.get("Blanco").getNumeroFichas() < 1){
             return true;
@@ -406,37 +499,57 @@ public class Damas {
             return false;
         }
     }
+    /*
+    Funcion para reiniciar el movimiento.
+    * */
     private void reiniciarMovimiento(){
         movimiento[0][0] = -1;
     }
+    /*
+    Funcion que retorna el turno en el que se encuentra el juego.
+    * */
     public int getTurno(){
         return turno;
     }
-
+    /*
+    Funcion que retorna el jugador actual.
+    * */
     public String getJugador(){
         return jugador;
     }
-
+    /*
+    Funcion que retorna el nombre del jugador actual.
+    * */
     public String getNombreJugador(String color) {
         return jugadores.get(color).getName();
     }
-
+    /*
+    Funcion que retorna el atributo victoria.
+    * */
     public boolean getVictoria(){
         return victoria;
     }
-
+    /*
+    Funcion que reinicia el atributo captura a su valor original.
+    * */
     private void reiniciarCaptura(){
         captura = false;
     }
-
+    /*
+    Funcion que retorna el atributo captura.
+    * */
     public boolean getCaptura(){
         return captura;
     }
-
+    /*
+    Funcion que retorna el atributo nuevaFicha.
+    * */
     public boolean getNuevaFicha(){
         return nuevaFicha;
     }
-
+    /*
+    Funcion para cambiar al siguiente turno.
+    * */
     private void siguienteTurno(){
         if(jugador.equals("Negro")){
             jugador = "Blanco";
@@ -453,7 +566,9 @@ public class Damas {
         }
         turno += 1;
     }
-
+    /*
+    Funcion para agregar una casilla al juego.
+    * */
     private void agregarCasilla(){
         boolean put = false;
         int tipo = (int)(Math.random()*(1));
@@ -477,6 +592,9 @@ public class Damas {
             j = (int)(Math.random()*(10));
         }
     }
+    /*
+    Funcion para agregar un comodin al juego.
+    * */
     private void agregarComodin(){
         boolean put = false;
         int tipo = (int)(Math.random()*(2));
@@ -503,42 +621,73 @@ public class Damas {
             j = (int)(Math.random()*(10));
         }
     }
+    /*
+    Funcion para realizar la accion necesaria del comodin que quiere usar el jugador.
+    * */
     public void usarComodin(Comodin comodinUsado){
         if(comodinUsado instanceof Gun){
             accionGun();
         }
     }
+    /*
+    Funcion para realizar la accion del comodin tipo Gun.
+    * */
     public void accionGun(){
 
     }
-
+    /*
+    Funcion para reiniciar las variables que se encargan de los comodines y la comunicacion con el GUI.
+    * */
     private void reiniciarComodines(){
         casilla = false;
         comodin = false;
         mine = false;
     }
+    /*
+    Funcion que retorna el atributo casilla.
+    * */
     public boolean getCasilla() {
         return casilla;
     }
+    /*
+    Funcion que retorna el atributo comodin.
+    * */
     public boolean getComodin(){
         return comodin;
     }
+    /*
+    Funcion que retorna el atributo posicionCasilla.
+    * */
     public int[] getPosicionCasilla(){
         return posicionCasilla;
     }
+    /*
+    Funcion que retorna el atributo posicionComodin.
+    * */
     public int[] getPosicionComodin(){
         return posicionComodin;
     }
-
+    /*
+    Funcion que retorna el atributo tipoCasilla.
+    * */
     public String getTipoCasilla() {
         return tipoCasilla;
     }
+    /*
+    Funcion que retorna el atributo tipoComodin.
+    * */
     public String getTipoComodin(){
         return tipoComodin;
     }
+    /*
+    Funcion que retorna el atributo mine.
+    * */
     public boolean getMine(){
         return mine;
     }
+    /*
+    Funcion que retorna el inventario del jugador actual.
+    * */
     public ArrayList<Comodin> getInventarioJugador(String color){
         return jugadores.get(color).getInventario();
     }

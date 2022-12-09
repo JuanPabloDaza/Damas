@@ -42,13 +42,18 @@ public class DamasGUI extends JFrame {
     private int hora,minuto,segundo;
 
     private Damas logica;
+    /*
+    Constructor para los objetos de tipo DamasGUI
+    * */
     private DamasGUI(){
         super("Damas");
         logica = new Damas();
         turno = new JLabel("Turno: "+ Integer.toString(logica.getTurno()));
         prepareElements();
     }
-
+    /*
+    funcion para preparar los jugadores, se solicita un nombre para asignarselo a cada jugador.
+    * */
     private void prepareJugadores(){
         for(int i = 1; i < 3; i++){
             String nombre = JOptionPane.showInputDialog(null, "Escriba el nombre del jugador " + Integer.toString(i) + ".");
@@ -56,6 +61,9 @@ public class DamasGUI extends JFrame {
         }
     }
 
+    /*
+    Funcion para preparar los elementos de la ventana y el menu.
+    * */
     private void prepareElements() {
         Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (int) screenDimension.getWidth();
@@ -66,7 +74,9 @@ public class DamasGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         prepareElementsMainM();
     }
-
+    /*
+    Funcion para preparar los elementos del menu principal.
+    * */
     private void prepareElementsMainM() {
 
         menuM = new JPanel();
@@ -77,7 +87,9 @@ public class DamasGUI extends JFrame {
         add(menuM);
         prepareActionsMenu();
     }
-
+    /*
+    Funcion para preparar los elementos del menu de opciones.
+    * */
     private void prepareElementsMenu() {
         menubar = new JMenuBar();
         setJMenuBar(menubar);
@@ -88,7 +100,9 @@ public class DamasGUI extends JFrame {
         abrir = new JMenuItem("Abrir");
         menu.add(abrir);
     }
-
+    /*
+    Funcion para preparar los elementos del tablero
+    * */
     private void prepareElementsBoard() {
         tablero = new JPanel();
         tablero.setLayout(new BorderLayout());
@@ -148,7 +162,9 @@ public class DamasGUI extends JFrame {
         timer();
         timer.start();
     }
-
+    /*
+    Funcion para el cronometro del juego.
+    * */
     private void timer() {
         timer = new Timer(1000, new ActionListener() {
             @Override
@@ -172,6 +188,9 @@ public class DamasGUI extends JFrame {
             }
         });
     }
+    /*
+    Funcion para prepara los oyentes de las opciones del menu.
+    * */
     private void prepareActionsMenu(){
         play.addActionListener(new ActionListener() {
             @Override
@@ -186,6 +205,9 @@ public class DamasGUI extends JFrame {
             }
         });
     }
+    /*
+    Funcion para preparar los oyentes del tablero.
+    * */
     private void prepareActions(){
         for(int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
@@ -225,6 +247,9 @@ public class DamasGUI extends JFrame {
         });
     }
 
+    /*
+    Funcion para realizar un movimiento.
+    * */
     private void accionMovimiento(){
         cambio = malla[movimiento[0][0]][movimiento[0][1]].getIcon();
         if(logica.getVictoria()){
@@ -263,7 +288,9 @@ public class DamasGUI extends JFrame {
         info.add(jugador,BorderLayout.CENTER);
         jugador.setVisible(true);
     }
-
+    /*
+    Funcion para mostrar la nueva casilla creada.
+    * */
     private void accionNuevaCasilla(){
         int[] posicion = logica.getPosicionCasilla();
         if(logica.getTipoCasilla().equals("Mine")){
@@ -271,7 +298,9 @@ public class DamasGUI extends JFrame {
             malla[posicion[0]][posicion[1]].repaint();
         }
     }
-
+    /*
+    Funcion para mostrar el nuevo comodin creado.
+    * */
     private void accionNuevoComodin(){
         int[] posicion = logica.getPosicionComodin();
         if(logica.getTipoComodin().equals("Gun")){
@@ -282,7 +311,9 @@ public class DamasGUI extends JFrame {
             malla[posicion[0]][posicion[1]].repaint();
         }
     }
-
+    /*
+    Funcion para realizar la accion de la casilla Mina.
+    * */
     private void accionMina(){
         for(int i = movimiento[1][0]-1; i < movimiento[1][0]+2; i++){
             for(int j = movimiento[1][1] - 1; j < movimiento[1][1] + 2; j++){
@@ -296,10 +327,15 @@ public class DamasGUI extends JFrame {
         }
     }
 
+    /*
+    Funcion mostrar la victoria del jugador.
+    * */
     private void accionVictoria(){
         int output = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getNombreJugador(logica.getJugador()) + " acaba de ganar.", "Victoria", JOptionPane.DEFAULT_OPTION);
     }
-
+    /*
+    Funcion para mostrar la accion de captura de una ficha y actualizar el tablero.
+    * */
     private void accionCaptura(){
         if(movimiento[1][0] > movimiento[0][0]){
             if(movimiento[1][1] > movimiento[0][1]){
@@ -321,7 +357,9 @@ public class DamasGUI extends JFrame {
         malla[movimiento[1][0]][movimiento[1][1]].setIcon(cambio);
         malla[movimiento[1][0]][movimiento[1][1]].repaint();
     }
-
+    /*
+    Funcion para aignar el inventario del jugador.
+    * */
     private void inventarioTurno() {
         if (logica.getJugador().equals("Blanco")) {
             inventarioBlanco = crearInventario("Blanco");
@@ -332,7 +370,9 @@ public class DamasGUI extends JFrame {
             inventarioActual = inventarioNegro;
         }
     }
-
+    /*
+    Funcion para crear el inventario de Iconos del jugador.
+    * */
     private Object[] crearInventario(String color){
         ArrayList<Comodin> inventarioN = logica.getInventarioJugador(color);
         Object[] iconos = new Object[inventarioN.size()];
@@ -345,6 +385,9 @@ public class DamasGUI extends JFrame {
         }
         return iconos;
     }
+    /*
+    Funcion para mostrar el inventario de un jugador.
+    * */
     private void accionInventario() {
         inventarioTurno();
         try {
@@ -361,6 +404,9 @@ public class DamasGUI extends JFrame {
             JOptionPane.showMessageDialog(null,"Inventario Vacio","Damas",JOptionPane.ERROR_MESSAGE);
         }
     }
+    /*
+    Funcion para cambiar de ficha al llegar al otro lado del tablero.
+    * */
     private void accionNuevaFicha(){
         int m = JOptionPane.showOptionDialog(null,
                 "Seleccione un ficha para cambiar",
