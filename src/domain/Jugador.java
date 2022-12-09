@@ -36,5 +36,7 @@ public class Jugador {
     public int getNumeroFichas(){
         return fichas.size();
     }
-
+    public ArrayList<Comodin> getInventario(){
+        return inventario;
+    }
 }

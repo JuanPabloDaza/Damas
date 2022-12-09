@@ -1,4 +1,5 @@
 package presentation;
+import domain.Comodin;
 import domain.Damas;
 import domain.DamasException;
 import javax.swing.*;
@@ -27,9 +28,9 @@ public class DamasGUI extends JFrame {
     private Icon fichaReinaNegra = new ImageIcon("ficha_Reina_Negra.png");
     private Icon fichaReinaBlanca = new ImageIcon("ficha_Reina_Blanca.png");
     private Object[] opciones = {fichaReinaNegra};
-    private Object[] inventarioNegro = new Object[10];
-    private Object[] inventarioBlanco = new Object[10];
-    private Object[] inventarioActual = new Object[10];
+    private Object[] inventarioNegro;
+    private Object[] inventarioBlanco;
+    private Object[] inventarioActual;
     private Icon cambio;
     private int second,minute ;
     private Timer timer,timer2;
@@ -322,15 +323,30 @@ public class DamasGUI extends JFrame {
     }
 
     private void inventarioTurno() {
-        inventarioActual = inventarioNegro;
-        if (logica.getJugador() == "Blanca") {
+        if (logica.getJugador().equals("Blanco")) {
+            inventarioBlanco = crearInventario("Blanco");
             inventarioActual = inventarioBlanco;
         }
         else {
+            inventarioNegro = crearInventario("Negro");
             inventarioActual = inventarioNegro;
         }
     }
+
+    private Object[] crearInventario(String color){
+        ArrayList<Comodin> inventarioN = logica.getInventarioJugador(color);
+        Object[] iconos = new Object[inventarioN.size()];
+        for(int i = 0;i < inventarioN.size(); i++){
+            if(inventarioN.get(i) instanceof domain.Gun){
+                iconos[i] = comodinGunIcono;
+            } else if (inventarioN.get(i) instanceof domain.Stomp) {
+                iconos[i] = comodinStompIcono;
+            }
+        }
+        return iconos;
+    }
     private void accionInventario() {
+        inventarioTurno();
         try {
             int n = JOptionPane.showOptionDialog(null,
                     "Inventario",
@@ -340,6 +356,7 @@ public class DamasGUI extends JFrame {
                     null,
                     inventarioActual,
                     inventarioActual[0]);
+            logica.usarComodin(logica.getInventarioJugador(logica.getJugador()).get(n));
         }catch (Exception e ){
             JOptionPane.showMessageDialog(null,"Inventario Vacio","Damas",JOptionPane.ERROR_MESSAGE);
         }

@@ -467,6 +467,7 @@ public class Damas {
                         put = true;
                         tipoCasilla = "Mine";
                     }
+
                     casilla = true;
                     posicionCasilla[0] = i;
                     posicionCasilla[1] = j;
@@ -502,6 +503,14 @@ public class Damas {
             j = (int)(Math.random()*(10));
         }
     }
+    public void usarComodin(Comodin comodinUsado){
+        if(comodinUsado instanceof Gun){
+            accionGun();
+        }
+    }
+    public void accionGun(){
+
+    }
 
     private void reiniciarComodines(){
         casilla = false;
@@ -529,5 +538,8 @@ public class Damas {
     }
     public boolean getMine(){
         return mine;
+    }
+    public ArrayList<Comodin> getInventarioJugador(String color){
+        return jugadores.get(color).getInventario();
     }
 }
