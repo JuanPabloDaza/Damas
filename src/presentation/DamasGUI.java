@@ -12,7 +12,7 @@ public class DamasGUI extends JFrame {
     private JMenuBar menubar;
     private JMenu menu;
     private JMenuItem nuevo,abrir;
-    private JPanel tablero,juego,info,menuM,cTurno;
+    private JPanel tablero,juego,info,menuM;
 
     private JButton play;
     private JButton[][] malla;
@@ -67,7 +67,6 @@ public class DamasGUI extends JFrame {
 
         menuM = new JPanel();
         menuM.add(new JLabel("Damas Poob"));
-        menuM.setFont(new Font("Serif",Font.BOLD,20));
         play = new JButton();
         play.setText("PLAY");
         menuM.add(play);
