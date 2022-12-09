@@ -2,10 +2,15 @@ package domain;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Damas {
+    private Timer timer;
+    JLabel timeLabel;
     private Ficha[][] tablero = new Ficha[10][10];
     private ArrayList<Ficha> fichasB = new ArrayList<>();
     private ArrayList<Ficha> fichasN = new ArrayList<>();
@@ -18,6 +23,9 @@ public class Damas {
     private String jugador = "Negro";
     private HashMap<String,Jugador> jugadores = new HashMap<>();
     private int turno = 1;
+    DecimalFormat dFormat = new DecimalFormat("00");
+    private String ddSecond, ddMinute;
+    private int hora,minuto,segundo;
 
     public Damas(){
         crearTablero();
@@ -331,7 +339,6 @@ public class Damas {
             }
         }
     }
-
     private boolean victoria(){
         if(jugadores.get("Negro").getNumeroFichas() < 1 || jugadores.get("Blanco").getNumeroFichas() < 1){
             return true;

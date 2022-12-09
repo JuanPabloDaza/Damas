@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class DamasGUI extends JFrame {
 
@@ -14,7 +15,7 @@ public class DamasGUI extends JFrame {
     private JMenuItem nuevo,abrir;
     private JPanel tablero,juego,info,menuM;
 
-    private JButton play;
+    private JButton play,inventario;
     private JButton[][] malla;
     private boolean alreadyOne = false;
     private int[][] movimiento = new int[2][2];
@@ -23,12 +24,14 @@ public class DamasGUI extends JFrame {
     private Icon fichaReinaNegra = new ImageIcon("ficha_Reina_Negra.png");
     private Icon fichaReinaBlanca = new ImageIcon("ficha_Reina_Blanca.png");
     private Object[] opciones = {fichaReinaNegra};
+    private Object[] inventarioNegro = new Object[10];
+    private Object[] inventarioBlanco = new Object[10];
+    private Object[] inventarioActual = new Object[10];
     private Icon cambio;
-    JLabel timeLabel;
     private int second,minute ;
-    private Timer timer;
+    private Timer timer,timer2;
     private String ddSecond, ddMinute;
-    private JLabel turno,jugador;
+    private JLabel turno,jugador, timeLabel,timeLabel2;
 
     DecimalFormat dFormat = new DecimalFormat("00");
 
@@ -120,7 +123,6 @@ public class DamasGUI extends JFrame {
             }
         }
 
-
         tablero.add(juego,BorderLayout.CENTER);
         info = new JPanel();
         info.setLayout(new BorderLayout());
@@ -128,6 +130,10 @@ public class DamasGUI extends JFrame {
         info.add(jugador, BorderLayout.CENTER);
         tablero.add(info,BorderLayout.EAST);
         add(tablero);
+
+        inventario = new JButton();
+        tablero.add(inventario, BorderLayout.SOUTH);
+        inventario.setText("INVENTARIO");
 
         timeLabel = new JLabel();
         timeLabel.setText("--:--");
@@ -207,6 +213,12 @@ public class DamasGUI extends JFrame {
                 });
             }
         }
+        inventario.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ev) {
+                accionInventario();
+            }
+        });
     }
 
     private void accionMovimiento(){
@@ -266,6 +278,25 @@ public class DamasGUI extends JFrame {
         malla[movimiento[1][0]][movimiento[1][1]].repaint();
     }
 
+    private void inventarioTurno() {
+        inventarioActual = inventarioNegro;
+        if (logica.getJugador() == "Blanca") {
+            inventarioActual = inventarioBlanco;
+        }
+    }
+    private void accionInventario() {
+        int n = JOptionPane.showOptionDialog(null,
+                "Inventario",
+                "Inventario ",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                inventarioActual,
+                inventarioActual[0]);
+        if (inventarioNegro == null) {
+            System.out.println("El inventario es vacio");;
+        }
+    }
     private void accionNuevaFicha(){
         int m = JOptionPane.showOptionDialog(null,
                 "Seleccione un ficha para cambiar",
