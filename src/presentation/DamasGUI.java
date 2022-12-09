@@ -12,7 +12,7 @@ public class DamasGUI extends JFrame {
     private JMenuBar menubar;
     private JMenu menu;
     private JMenuItem nuevo,abrir;
-    private JPanel tablero,juego,info,menuM;
+    private JPanel tablero,juego,info,menuM,cTurno;
 
     private JButton play;
     private JButton[][] malla;
@@ -28,6 +28,7 @@ public class DamasGUI extends JFrame {
     private int second,minute ;
     private Timer timer;
     private String ddSecond, ddMinute;
+    private JLabel turno,jugador;
 
     DecimalFormat dFormat = new DecimalFormat("00");
 
@@ -37,6 +38,7 @@ public class DamasGUI extends JFrame {
     private DamasGUI(){
         super("Damas");
         logica = new Damas();
+        turno = new JLabel("Turno: "+ Integer.toString(logica.getTurno()));
         prepareElements();
     }
 
@@ -62,6 +64,7 @@ public class DamasGUI extends JFrame {
 
         menuM = new JPanel();
         menuM.add(new JLabel("Damas Poob"));
+        menuM.setFont(new Font("Serif",Font.BOLD,20));
         play = new JButton();
         play.setText("PLAY");
         menuM.add(play);
@@ -122,14 +125,13 @@ public class DamasGUI extends JFrame {
         tablero.add(juego,BorderLayout.CENTER);
         info = new JPanel();
         info.setLayout(new BorderLayout());
-        info.add(new JLabel("Turno"),BorderLayout.NORTH);
-        info.add(new JLabel("Jugador"), BorderLayout.CENTER);
+        info.add(turno, BorderLayout.NORTH);
+        info.add(jugador, BorderLayout.CENTER);
         tablero.add(info,BorderLayout.EAST);
         add(tablero);
 
         timeLabel = new JLabel();
         timeLabel.setText("--:--");
-        timeLabel.setBounds(100,100,200,100);
         timeLabel.setHorizontalAlignment(JLabel.CENTER);
         info.add(timeLabel,BorderLayout.SOUTH);
         second = 60;
@@ -168,10 +170,10 @@ public class DamasGUI extends JFrame {
                 menuM.setVisible(false);
                 menuM.removeAll();
                 prepareJugadores();
+                jugador = new JLabel("Jugador: "+logica.getNombreJugador(logica.getJugador()));
                 prepareElementsMenu();
                 prepareElementsBoard();
                 prepareActions();
-
             }
         });
     }
@@ -227,6 +229,16 @@ public class DamasGUI extends JFrame {
         if(logica.getNuevaFicha()){
             accionNuevaFicha();
         }
+
+        turno.setVisible(false);
+        turno = new JLabel("Turno: "+ Integer.toString(logica.getTurno()));
+        info.add(turno,BorderLayout.NORTH);
+        turno.setVisible(true);
+
+        jugador.setVisible(false);
+        jugador = new JLabel("Jugardor: " +logica.getNombreJugador(logica.getJugador()));
+        info.add(jugador,BorderLayout.CENTER);
+        jugador.setVisible(true);
     }
 
     private void accionVictoria(){

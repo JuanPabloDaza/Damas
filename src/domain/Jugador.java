@@ -23,6 +23,10 @@ public class Jugador {
         name = nombre;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void agregarComodin(Comodin comodin){
         inventario.add(comodin);
     }
@@ -32,7 +36,5 @@ public class Jugador {
     public int getNumeroFichas(){
         return fichas.size();
     }
-    public String getName(){
-        return name;
-    }
+
 }
