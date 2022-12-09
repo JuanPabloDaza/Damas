@@ -691,4 +691,7 @@ public class Damas {
     public ArrayList<Comodin> getInventarioJugador(String color){
         return jugadores.get(color).getInventario();
     }
+    public Ficha[][] getTablero(){
+        return tablero;
+    }
 }

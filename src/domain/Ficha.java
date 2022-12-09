@@ -24,10 +24,14 @@ public abstract class Ficha {
     public String getColor(){
         return color;
     }
-
-    public boolean equals(Ficha ficha){
-        if(this.getPositionX() == ficha.getPositionX() && this.getPositionY() == ficha.getPositionY()){
-            return true;
+    @Override
+    public boolean equals(Object ficha){
+        if(ficha instanceof Ficha) {
+            if (this.getPositionX() == ((Ficha) ficha).getPositionX() && this.getPositionY() == ((Ficha) ficha).getPositionY()) {
+                return true;
+            } else {
+                return false;
+            }
         }else{
             return false;
         }
