@@ -12,6 +12,10 @@ public class Jugador {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void agregarComodin(Comodin comodin){
         inventario.add(comodin);
     }

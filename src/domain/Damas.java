@@ -208,6 +208,8 @@ public class Damas {
         }
     }
 
+
+
     private void finalizarMovimiento(){
         tablero[movimiento[1][0]][movimiento[1][1]] = tablero[movimiento[0][0]][movimiento[0][1]];
         tablero[movimiento[0][0]][movimiento[0][1]] = null;
@@ -344,6 +346,10 @@ public class Damas {
 
     public String getJugador(){
         return jugador;
+    }
+
+    public String getNombreJugador(String color) {
+        return jugadores.get(color).getName();
     }
 
     public boolean getVictoria(){
