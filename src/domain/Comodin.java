@@ -9,4 +9,11 @@ public abstract class Comodin {
         this.posicionY = posicionY;
     }
 
+    public int getPosicionX(){
+        return posicionX;
+    }
+    public int getPosicionY(){
+        return posicionY;
+    }
+
 }

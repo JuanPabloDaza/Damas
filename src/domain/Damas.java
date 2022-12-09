@@ -17,7 +17,7 @@ public class Damas {
 
     private String jugador = "Negro";
     private HashMap<String,Jugador> jugadores = new HashMap<>();
-    private int turno = 0;
+    private int turno = 1;
 
     public Damas(){
         crearTablero();
@@ -25,17 +25,19 @@ public class Damas {
     }
 
     private void crearTablero(){
+        jugadores.put("Negro",new Jugador("Negro"));
+        jugadores.put("Blanco", new Jugador("Blanco"));
         for(int i = 0; i<10; i++) {
             for (int j = 0; j<10; j++) {
                 if ((i + j) % 2 != 0) {
                     if (i < 4) {
                         FichaNormal ficha = new FichaNormal("Negro", i, j);
                         tablero[i][j] = ficha;
-                        fichasN.add(ficha);
+                        jugadores.get("Negro").agregarFicha(ficha);
                     } else if (i > 5) {
                         FichaNormal ficha = new FichaNormal("Blanco", i, j);
                         tablero[i][j] = ficha;
-                        fichasB.add(ficha);
+                        jugadores.get("Blanco").agregarFicha(ficha);
                     }
                 }
             }
@@ -44,9 +46,9 @@ public class Damas {
 
     public void agregarJugador(int i, String nombre){
         if(i == 1){
-            jugadores.put("Negro",new Jugador("Negro", nombre));
+            jugadores.get("Negro").cambiarNombre(nombre);
         }else{
-            jugadores.put("Blanco",new Jugador("Blanco", nombre));
+            jugadores.get("Blanco").cambiarNombre(nombre);
         }
     }
 
@@ -67,7 +69,7 @@ public class Damas {
         if(tablero[movimiento[0][0]][movimiento[0][1]] == null){
             reiniciarMovimiento();
             throw new DamasException(DamasException.MOVIMIENTO_INVALIDO);
-        } else if (tablero[movimiento[1][0]][movimiento[1][1]] != null) {
+        } else if (tablero[movimiento[1][0]][movimiento[1][1]] instanceof Ficha) {
             reiniciarMovimiento();
             throw new DamasException(DamasException.MOVIMIENTO_INVALIDO);
         }else {
@@ -228,9 +230,9 @@ public class Damas {
                 if(tablero[movimiento[1][0] - 1][movimiento[1][1] - 1] != null){
                     if(!tablero[movimiento[1][0] - 1][movimiento[1][1] - 1].getColor().equals(jugador)){
                         if(jugador.equals("Negro")){
-                            fichasB.remove(tablero[movimiento[1][0] - 1][movimiento[1][1] - 1]);
+                            jugadores.get("Blanco").quitarFicha(tablero[movimiento[1][0] - 1][movimiento[1][1] - 1]);
                         }else{
-                            fichasN.remove(tablero[movimiento[1][0] - 1][movimiento[1][1] - 1]);
+                            jugadores.get("Negro").quitarFicha(tablero[movimiento[1][0] - 1][movimiento[1][1] - 1]);
                         }
                         tablero[movimiento[1][0] - 1][movimiento[1][1] - 1] = null;
                         captura = true;
@@ -244,9 +246,9 @@ public class Damas {
                 if(tablero[movimiento[1][0] - 1][movimiento[1][1] + 1] != null){
                     if(!tablero[movimiento[1][0] - 1][movimiento[1][1] + 1].getColor().equals(jugador)){
                         if(jugador.equals("Negro")){
-                            fichasB.remove(tablero[movimiento[1][0] - 1][movimiento[1][1] + 1]);
+                            jugadores.get("Blanco").quitarFicha(tablero[movimiento[1][0] - 1][movimiento[1][1] + 1]);
                         }else{
-                            fichasN.remove(tablero[movimiento[1][0] - 1][movimiento[1][1] + 1]);
+                            jugadores.get("Negro").quitarFicha(tablero[movimiento[1][0] - 1][movimiento[1][1] + 1]);
                         }
                         tablero[movimiento[1][0] - 1][movimiento[1][1] + 1] = null;
                         captura = true;
@@ -262,9 +264,9 @@ public class Damas {
                 if(tablero[movimiento[1][0] + 1][movimiento[1][1] - 1] != null){
                     if(!tablero[movimiento[1][0] + 1][movimiento[1][1] - 1].getColor().equals(jugador)){
                         if(jugador.equals("Negro")){
-                            fichasB.remove(tablero[movimiento[1][0] + 1][movimiento[1][1] - 1]);
+                            jugadores.get("Blanco").quitarFicha(tablero[movimiento[1][0] + 1][movimiento[1][1] - 1]);
                         }else{
-                            fichasN.remove(tablero[movimiento[1][0] + 1][movimiento[1][1] - 1]);
+                            jugadores.get("Negro").quitarFicha(tablero[movimiento[1][0] + 1][movimiento[1][1] - 1]);
                         }
                         tablero[movimiento[1][0] + 1][movimiento[1][1] - 1] = null;
                         captura = true;
@@ -279,9 +281,9 @@ public class Damas {
                 if(tablero[movimiento[1][0] + 1][movimiento[1][1] + 1] != null){
                     if(!tablero[movimiento[1][0] + 1][movimiento[1][1] + 1].getColor().equals(jugador)){
                         if(jugador.equals("Negro")){
-                            fichasB.remove(tablero[movimiento[1][0] + 1][movimiento[1][1] + 1]);
+                            jugadores.get("Blanco").quitarFicha(tablero[movimiento[1][0] + 1][movimiento[1][1] + 1]);
                         }else{
-                            fichasN.remove(tablero[movimiento[1][0] + 1][movimiento[1][1] + 1]);
+                            jugadores.get("Negro").quitarFicha(tablero[movimiento[1][0] + 1][movimiento[1][1] + 1]);
                         }
                         tablero[movimiento[1][0] + 1][movimiento[1][1] + 1] = null;
                         captura = true;
@@ -300,18 +302,18 @@ public class Damas {
 
     public void cambiarFicha(int i){
         if(jugador.equals("Negro")){
-            fichasB.remove(tablero[movimiento[1][0]][movimiento[1][1]]);
+            jugadores.get("Blanco").quitarFicha(tablero[movimiento[1][0]][movimiento[1][1]]);
             if(i == 0){
                 Ficha ficha = new FichaReina("Blanco", movimiento[1][0], movimiento[1][1]);
                 tablero[movimiento[1][0]][movimiento[1][1]] = ficha;
-                fichasB.add(ficha);
+                jugadores.get("Blanco").agregarFicha(ficha);
             }
         }else{
-            fichasN.remove(tablero[movimiento[1][0]][movimiento[1][1]]);
+            jugadores.get("Negro").quitarFicha(tablero[movimiento[1][0]][movimiento[1][1]]);
             if(i == 0){
                 Ficha ficha = new FichaReina("Negro", movimiento[1][0], movimiento[1][1]);
                 tablero[movimiento[1][0]][movimiento[1][1]] = ficha;
-                fichasN.add(ficha);
+                jugadores.get("Negro").agregarFicha(ficha);
             }
         }
     }
@@ -329,7 +331,7 @@ public class Damas {
     }
 
     private boolean victoria(){
-        if(fichasN.size() < 1 || fichasB.size() < 1){
+        if(jugadores.get("Negro").getNumeroFichas() < 1 || jugadores.get("Blanco").getNumeroFichas() < 1){
             return true;
         }else {
             return false;

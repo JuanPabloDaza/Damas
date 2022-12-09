@@ -34,7 +34,7 @@ public class DamasGUI extends JFrame {
     private int hora,minuto,segundo;
 
     private Damas logica;
-    DamasGUI(){
+    private DamasGUI(){
         super("Damas");
         logica = new Damas();
         prepareElements();
