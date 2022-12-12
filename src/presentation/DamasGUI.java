@@ -32,12 +32,14 @@ public class DamasGUI extends JFrame {
     private Object[] inventarioBlanco;
     private Object[] inventarioActual;
     private Icon cambio;
-    private int second,minute,second2,minute2 ;
+    private int second,minute,second2,minute2;
     private Timer timer,timer2;
     private String ddSecond, ddMinute,ddSecond2, ddMinute2;
     private JLabel turno,jugador, timeLabel,timeLabel2;
 
     DecimalFormat dFormat = new DecimalFormat("00");
+    int bSecond = -1;
+    int bMinute = -1;
 
     private int hora,minuto,segundo;
 
@@ -163,11 +165,6 @@ public class DamasGUI extends JFrame {
         timeLabel2.setText("--:--");
         timeLabel2.setHorizontalAlignment(JLabel.CENTER);
         info.add(timeLabel,BorderLayout.SOUTH);
-
-        second = 5;
-        minute = 0;
-        second2 = 5;
-        minute2 = 0;
         timer();
         timer.start();
         timer2();
@@ -185,7 +182,7 @@ public class DamasGUI extends JFrame {
                 timeLabel.setText(ddMinute+ ":" +ddSecond);
 
                 if (second == -1) {
-                    second = 60;
+                    second = 59;
                     minute--;
                     ddSecond = dFormat.format(second);
                     ddMinute = dFormat.format(minute);
@@ -211,7 +208,7 @@ public class DamasGUI extends JFrame {
                 timeLabel2.setText(ddMinute2+ ":" +ddSecond2);
 
                 if (second2 == -1) {
-                    second2 = 60;
+                    second2 = 59;
                     minute2--;
                     ddSecond2 = dFormat.format(second2);
                     ddMinute2 = dFormat.format(minute2);
@@ -242,6 +239,24 @@ public class DamasGUI extends JFrame {
                 prepareElementsMenu();
                 prepareElementsBoard();
                 prepareActions();
+                if (bSecond == -1 && bMinute == -1) {
+                    second = 60;
+                    minute = 1;
+                    second2 = 60;
+                    minute2 = 1;
+                }
+            }
+        });
+
+        tiempo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                bSecond = Integer.parseInt(JOptionPane.showInputDialog("Digite los segundos: "));
+                second = bSecond;
+                second2 = bSecond;
+                bMinute = Integer.parseInt(JOptionPane.showInputDialog("Digite los minutos: "));
+                minute = bMinute;
+                minute2 = bMinute;
             }
         });
     }
