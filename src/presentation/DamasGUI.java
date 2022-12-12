@@ -16,7 +16,7 @@ public class DamasGUI extends JFrame {
     private JMenuItem nuevo,abrir;
     private JPanel tablero,juego,info,menuM;
 
-    private JButton play,inventario;
+    private JButton play,inventario,tiempo;
     private JButton[][] malla;
     private boolean alreadyOne = false;
     private int[][] movimiento = new int[2][2];
@@ -32,9 +32,9 @@ public class DamasGUI extends JFrame {
     private Object[] inventarioBlanco;
     private Object[] inventarioActual;
     private Icon cambio;
-    private int second,minute ;
+    private int second,minute,second2,minute2 ;
     private Timer timer,timer2;
-    private String ddSecond, ddMinute;
+    private String ddSecond, ddMinute,ddSecond2, ddMinute2;
     private JLabel turno,jugador, timeLabel,timeLabel2;
 
     DecimalFormat dFormat = new DecimalFormat("00");
@@ -83,7 +83,10 @@ public class DamasGUI extends JFrame {
         menuM.add(new JLabel("Damas Poob"));
         play = new JButton();
         play.setText("PLAY");
+        tiempo = new JButton();
+        tiempo.setText("TIME");
         menuM.add(play);
+        menuM.add(tiempo);
         add(menuM);
         prepareActionsMenu();
     }
@@ -156,11 +159,18 @@ public class DamasGUI extends JFrame {
         timeLabel = new JLabel();
         timeLabel.setText("--:--");
         timeLabel.setHorizontalAlignment(JLabel.CENTER);
+        timeLabel2 = new JLabel();
+        timeLabel2.setText("--:--");
+        timeLabel2.setHorizontalAlignment(JLabel.CENTER);
         info.add(timeLabel,BorderLayout.SOUTH);
-        second = 60;
-        minute = 1;
+
+        second = 5;
+        minute = 0;
+        second2 = 5;
+        minute2 = 0;
         timer();
         timer.start();
+        timer2();
     }
     /*
     Funcion para el cronometro del juego.
@@ -180,14 +190,44 @@ public class DamasGUI extends JFrame {
                     ddSecond = dFormat.format(second);
                     ddMinute = dFormat.format(minute);
                     timeLabel.setText(ddMinute+ ":" +ddSecond);
-
                 }
-                if (minute == 0 && second == 0){
+                if (minute == 0 && second == 0) {
+                    timer.stop();
+                    int outputTime = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getNombreJugador(logica.getJugador()) + " acaba de perder.", "VictoriaTime1", JOptionPane.DEFAULT_OPTION);
+                }
+                if (logica.getJugador().equals("Blanco")) {
                     timer.stop();
                 }
             }
         });
     }
+    private void timer2() {
+        timer2 = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                second2--;
+                ddSecond2 = dFormat.format(second2);
+                ddMinute2 = dFormat.format(minute2);
+                timeLabel2.setText(ddMinute2+ ":" +ddSecond2);
+
+                if (second2 == -1) {
+                    second2 = 60;
+                    minute2--;
+                    ddSecond2 = dFormat.format(second2);
+                    ddMinute2 = dFormat.format(minute2);
+                    timeLabel2.setText(ddMinute2+ ":" +ddSecond2);
+                }
+                if (minute2 == 0 && second2 == 0) {
+                    timer2.stop();
+                    int outputTime = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getNombreJugador(logica.getJugador()) + " acaba de perder.", "VictoriaTime2", JOptionPane.DEFAULT_OPTION);
+                }
+                if (logica.getJugador().equals("Negro")) {
+                    timer2.stop();
+                }
+            }
+        });
+    }
+
     /*
     Funcion para prepara los oyentes de las opciones del menu.
     * */
@@ -287,6 +327,18 @@ public class DamasGUI extends JFrame {
         jugador = new JLabel("Jugardor: " +logica.getNombreJugador(logica.getJugador()));
         info.add(jugador,BorderLayout.CENTER);
         jugador.setVisible(true);
+
+        if (logica.getJugador().equals("Negro")) {
+            timer.start();
+            timeLabel2.setVisible(false);
+            timeLabel.setVisible(true);
+            info.add(timeLabel,BorderLayout.SOUTH);
+        } else {
+            timer2.start();
+            timeLabel.setVisible(false);
+            timeLabel2.setVisible(true);
+            info.add(timeLabel2,BorderLayout.SOUTH);
+        }
     }
     /*
     Funcion para mostrar la nueva casilla creada.
