@@ -195,6 +195,9 @@ public class DamasGUI extends JFrame {
                 if (logica.getJugador().equals("Blanco")) {
                     timer.stop();
                 }
+                if (minute2 == 0 && second2 == 0) {
+                    timer.stop();
+                }
             }
         });
     }
@@ -219,6 +222,9 @@ public class DamasGUI extends JFrame {
                     int outputTime = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getNombreJugador(logica.getJugador()) + " acaba de perder.", "VictoriaTime2", JOptionPane.DEFAULT_OPTION);
                 }
                 if (logica.getJugador().equals("Negro")) {
+                    timer2.stop();
+                }
+                if (minute == 0 && second == 0) {
                     timer2.stop();
                 }
             }
