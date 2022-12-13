@@ -348,7 +348,6 @@ public class Damas implements Serializable{
     * */
     private void accionMina(){
         tableroCasillas[movimiento[1][0]][movimiento[1][1]] = null;
-        tablero[movimiento[0][0]][movimiento[0][1]] = null;
         for(int i = movimiento[1][0]-1; i < movimiento[1][0]+2; i++){
             for(int j = movimiento[1][1] - 1; j < movimiento[1][1]+2; j++){
                 try{
@@ -597,7 +596,7 @@ public class Damas implements Serializable{
     * */
     private void agregarComodin(){
         boolean put = false;
-        int tipo = (int)(Math.random()*(2));
+        int tipo = (int)(Math.random()*(1));
         int i = (int)(Math.random()*(10));
         int j = (int)(Math.random()*(10));
         while (!put){
@@ -625,7 +624,7 @@ public class Damas implements Serializable{
     Funcion para realizar la accion necesaria del comodin que quiere usar el jugador.
     * */
     public void usarComodin(int opcionInventario, int[] posicionUsoComodin){
-        if(jugadores.get(jugador).getInventario().get(opcionInventario) instanceof Gun){
+        if(jugadores.get(jugador).getInventario().get(opcionInventario) instanceof Gun) {
             jugadores.get(jugador).quitarComodin(jugadores.get(jugador).getInventario().get(opcionInventario));
             accionGun(posicionUsoComodin);
         }
@@ -634,6 +633,11 @@ public class Damas implements Serializable{
     Funcion para realizar la accion del comodin tipo Gun.
     * */
     public void accionGun(int[] posicionUsoComodin){
+        if(tablero[posicionUsoComodin[0]][posicionUsoComodin[1]].getColor().equals("Negro")){
+            jugadores.get("Negro").quitarFicha(tablero[posicionUsoComodin[0]][posicionUsoComodin[1]]);
+        }else{
+            jugadores.get("Blanco").quitarFicha(tablero[posicionUsoComodin[0]][posicionUsoComodin[1]]);
+        }
         tablero[posicionUsoComodin[0]][posicionUsoComodin[1]] = null;
         gun = true;
     }
