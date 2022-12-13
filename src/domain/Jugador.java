@@ -1,8 +1,9 @@
 package domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Jugador {
+public class Jugador implements Serializable{
     private String color;
     private String name;
     private ArrayList<Comodin> inventario = new ArrayList<>();

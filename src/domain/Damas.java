@@ -2,12 +2,13 @@ package domain;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class Damas {
+public class Damas implements Serializable{
     private Timer timer;
     JLabel timeLabel;
     private Ficha[][] tablero = new Ficha[10][10];
@@ -16,6 +17,7 @@ public class Damas {
     private boolean victoria = false;
     private int[][] movimiento = new int[2][2];
     private boolean nuevaFicha = false;
+    private boolean gun = false;
 
     private boolean captura = false;
     private boolean comodin = false;
@@ -358,13 +360,13 @@ public class Damas {
                             jugadores.get("Blanco").quitarFicha(tablero[i][j]);
                             tablero[i][j] = null;
                         }
-                        mine = true;
                     }
                 }catch (Exception e){
 
                 }
             }
         }
+        mine = true;
     }
     /*
     Funcion para realizar la accion de una casilla tipo teleport.
@@ -622,16 +624,18 @@ public class Damas {
     /*
     Funcion para realizar la accion necesaria del comodin que quiere usar el jugador.
     * */
-    public void usarComodin(Comodin comodinUsado){
-        if(comodinUsado instanceof Gun){
-            accionGun();
+    public void usarComodin(int opcionInventario, int[] posicionUsoComodin){
+        if(jugadores.get(jugador).getInventario().get(opcionInventario) instanceof Gun){
+            jugadores.get(jugador).quitarComodin(jugadores.get(jugador).getInventario().get(opcionInventario));
+            accionGun(posicionUsoComodin);
         }
     }
     /*
     Funcion para realizar la accion del comodin tipo Gun.
     * */
-    public void accionGun(){
-
+    public void accionGun(int[] posicionUsoComodin){
+        tablero[posicionUsoComodin[0]][posicionUsoComodin[1]] = null;
+        gun = true;
     }
     /*
     Funcion para reiniciar las variables que se encargan de los comodines y la comunicacion con el GUI.
@@ -640,6 +644,7 @@ public class Damas {
         casilla = false;
         comodin = false;
         mine = false;
+        gun = false;
     }
     /*
     Funcion que retorna el atributo casilla.
@@ -691,5 +696,39 @@ public class Damas {
     }
     public Ficha[][] getTablero(){
         return tablero;
+    }
+    public Comodin[][] getTableroComodin(){
+        return tableroComodin;
+    }
+    public Casillas[][] getTableroCasilla(){
+        return tableroCasillas;
+    }
+    public boolean getGun(){
+        return gun;
+    }
+    public Damas opcionAbrir(File archivo) throws DamasException{
+        Damas nuevo = null;
+        if(!archivo.getName().endsWith(".dat")) throw new DamasException(DamasException.TYPE_DAT_ERROR);
+        try{
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(archivo));
+            nuevo = (Damas) in.readObject();
+            in.close();
+        }catch (ClassNotFoundException e){
+            throw new DamasException(DamasException.FILE_NOT_FOUND_ERROR);
+        }catch (IOException e){
+            throw new DamasException("Ocurrio un error al abrir el archivo" + archivo.getName());
+        }
+        return nuevo;
+    }
+
+    public void opcionGuardar(File archivo) throws DamasException{
+        if(!archivo.getName().endsWith(".dat")) throw new DamasException(DamasException.TYPE_DAT_ERROR);
+        try{
+            ObjectOutputStream salida = new ObjectOutputStream(new FileOutputStream(archivo));
+            salida.writeObject(this);
+            salida.close();
+        }catch (IOException e) {
+            throw new DamasException("Ocurrio un error al salvar " + archivo.getName());
+        }
     }
 }

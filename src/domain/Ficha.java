@@ -1,6 +1,8 @@
 package domain;
 
-public abstract class Ficha {
+import java.io.Serializable;
+
+public abstract class Ficha implements Serializable {
     private String color;
     private int positionX, positionY;
 

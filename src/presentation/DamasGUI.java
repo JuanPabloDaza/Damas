@@ -1,11 +1,12 @@
 package presentation;
-import domain.Comodin;
-import domain.Damas;
-import domain.DamasException;
+import domain.*;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -13,8 +14,9 @@ public class DamasGUI extends JFrame {
 
     private JMenuBar menubar;
     private JMenu menu;
-    private JMenuItem nuevo,abrir;
+    private JMenuItem nuevo,abrir, guardar, importar, exportar;
     private JPanel tablero,juego,info,menuM;
+    private JFileChooser fileChooser;
 
     private JButton play,inventario,tiempo;
     private JButton[][] malla;
@@ -31,6 +33,9 @@ public class DamasGUI extends JFrame {
     private Object[] inventarioNegro;
     private Object[] inventarioBlanco;
     private Object[] inventarioActual;
+    private boolean usoComodin;
+    private int opcionInventario;
+    private int[] posicionUsoComodin = new int[2];
     private Icon cambio;
     private int second,minute,second2,minute2;
     private Timer timer,timer2;
@@ -74,6 +79,8 @@ public class DamasGUI extends JFrame {
         setSize(dimension);
         setLocation((x-this.getWidth())/2,(y-this.getHeight())/2);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        fileChooser = new JFileChooser();
+        fileChooser.setVisible(false);
         prepareElementsMainM();
     }
     /*
@@ -104,6 +111,12 @@ public class DamasGUI extends JFrame {
         menu.add(nuevo);
         abrir = new JMenuItem("Abrir");
         menu.add(abrir);
+        guardar = new JMenuItem("Guardar");
+        menu.add(guardar);
+        importar = new JMenuItem("Importar");
+        menu.add(importar);
+        exportar = new JMenuItem("Exportar");
+        menu.add(exportar);
     }
     /*
     Funcion para preparar los elementos del tablero
@@ -190,12 +203,10 @@ public class DamasGUI extends JFrame {
                 }
                 if (minute == 0 && second == 0) {
                     timer.stop();
+                    timer2.stop();
                     int outputTime = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getNombreJugador(logica.getJugador()) + " acaba de perder.", "VictoriaTime1", JOptionPane.DEFAULT_OPTION);
                 }
                 if (logica.getJugador().equals("Blanco")) {
-                    timer.stop();
-                }
-                if (minute2 == 0 && second2 == 0) {
                     timer.stop();
                 }
             }
@@ -219,12 +230,10 @@ public class DamasGUI extends JFrame {
                 }
                 if (minute2 == 0 && second2 == 0) {
                     timer2.stop();
+                    timer.stop();
                     int outputTime = JOptionPane.showConfirmDialog(null, "El jugador " + logica.getNombreJugador(logica.getJugador()) + " acaba de perder.", "VictoriaTime2", JOptionPane.DEFAULT_OPTION);
                 }
                 if (logica.getJugador().equals("Negro")) {
-                    timer2.stop();
-                }
-                if (minute == 0 && second == 0) {
                     timer2.stop();
                 }
             }
@@ -278,16 +287,27 @@ public class DamasGUI extends JFrame {
                             for (int col = 0; col < 10; col++) {
                                 if (malla[row][col] == ev.getSource()) {
                                     try {
-                                        logica.realizarMovimiento(row, col);
-                                        if (alreadyOne) {
-                                            movimiento[1][0] = row;
-                                            movimiento[1][1] = col;
-                                            accionMovimiento();
-                                            alreadyOne = false;
-                                        } else {
-                                            movimiento[0][0] = row;
-                                            movimiento[0][1] = col;
-                                            alreadyOne = true;
+                                        if(usoComodin){
+                                            posicionUsoComodin[0] = row;
+                                            posicionUsoComodin[1] = col;
+                                            logica.usarComodin(opcionInventario, posicionUsoComodin);
+                                            if(logica.getGun()){
+                                                malla[row][col].setIcon(null);
+                                                malla[row][col].repaint();
+                                            }
+                                            usoComodin = false;
+                                        }else {
+                                            logica.realizarMovimiento(row, col);
+                                            if (alreadyOne) {
+                                                movimiento[1][0] = row;
+                                                movimiento[1][1] = col;
+                                                accionMovimiento();
+                                                alreadyOne = false;
+                                            } else {
+                                                movimiento[0][0] = row;
+                                                movimiento[0][1] = col;
+                                                alreadyOne = true;
+                                            }
                                         }
                                     } catch (DamasException e) {
                                         alreadyOne = false;
@@ -304,6 +324,40 @@ public class DamasGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 accionInventario();
+            }
+        });
+        nuevo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tablero.setVisible(false);
+                logica = new Damas();
+                timer.stop();
+                timer2.stop();
+                prepareElements();
+            }
+        });
+        abrir.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                accionAbrir();
+            }
+        });
+        guardar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                accionGuardar();
+            }
+        });
+        importar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                accionImportar();
+            }
+        });
+        exportar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                accionExportar();
             }
         });
     }
@@ -462,9 +516,10 @@ public class DamasGUI extends JFrame {
     Funcion para mostrar el inventario de un jugador.
     * */
     private void accionInventario() {
+        usoComodin = false;
         inventarioTurno();
         try {
-            int n = JOptionPane.showOptionDialog(null,
+            opcionInventario = JOptionPane.showOptionDialog(null,
                     "Inventario",
                     "Inventario ",
                     JOptionPane.DEFAULT_OPTION,
@@ -472,7 +527,9 @@ public class DamasGUI extends JFrame {
                     null,
                     inventarioActual,
                     inventarioActual[0]);
-            logica.usarComodin(logica.getInventarioJugador(logica.getJugador()).get(n));
+            if(opcionInventario != -1) {
+                usoComodin = true;
+            }
         }catch (Exception e ){
             JOptionPane.showMessageDialog(null,"Inventario Vacio","Damas",JOptionPane.ERROR_MESSAGE);
         }
@@ -499,6 +556,85 @@ public class DamasGUI extends JFrame {
             }
         }
         logica.cambiarFicha(m);
+    }
+    private void accionAbrir(){
+        try{
+            fileChooser.setVisible(true);
+            int seleccion = fileChooser.showOpenDialog(abrir);
+            if(seleccion == JFileChooser.APPROVE_OPTION){
+                File fichero = fileChooser.getSelectedFile();
+                logica = logica.opcionAbrir(fichero);
+                actualizarGUI();
+            }
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void accionGuardar(){
+        try{
+            fileChooser.setVisible(true);
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Archivo DAT","dat"));
+            int seleccion = fileChooser.showSaveDialog(guardar);
+            if(seleccion == JFileChooser.APPROVE_OPTION){
+                File fichero = fileChooser.getSelectedFile();
+                logica.opcionGuardar(fichero);
+            }
+        }catch(DamasException e){
+            JOptionPane.showMessageDialog(null, e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void accionImportar(){
+
+    }
+    private void accionExportar(){
+
+    }
+
+    private void actualizarGUI(){
+        Ficha[][] nuevoTablero = logica.getTablero();
+        Comodin[][] nuevoTableroComodin = logica.getTableroComodin();
+        Casillas[][] nuevoTableroCasillas = logica.getTableroCasilla();
+        for(int i = 0; i<10; i++){
+            for(int j = 0; j < 10; j++){
+                if(nuevoTablero[i][j] != null){
+                    if(nuevoTablero[i][j] instanceof FichaNormal){
+                        if(nuevoTablero[i][j].getColor().equals("Negro")){
+                            malla[i][j].setIcon(fichaNormalNegra);
+                            malla[i][j].repaint();
+                        }else{
+                            malla[i][j].setIcon(fichaNormalBlanca);
+                            malla[i][j].repaint();
+                        }
+                    } else if (nuevoTablero[i][j] instanceof FichaReina) {
+                        if(nuevoTablero[i][j].getColor().equals("Negro")){
+                            malla[i][j].setIcon(fichaReinaNegra);
+                            malla[i][j].repaint();
+                        }else{
+                            malla[i][j].setIcon(fichaReinaBlanca);
+                            malla[i][j].repaint();
+                        }
+                    }
+
+                } else if (nuevoTableroComodin[i][j] != null) {
+                    if(nuevoTableroComodin[i][j] instanceof Gun){
+                        malla[i][j].setIcon(comodinGunIcono);
+                        malla[i][j].repaint();
+                    } else if (nuevoTableroComodin[i][j] instanceof Stomp) {
+                        malla[i][j].setIcon(comodinStompIcono);
+                        malla[i][j].repaint();
+                    }
+                } else if (nuevoTableroCasillas[i][j] != null) {
+                    if(nuevoTableroCasillas[i][j] instanceof Mine){
+                        malla[i][j].setIcon(casillaMinaIcono);
+                        malla[i][j].repaint();
+                    }
+                }else{
+                    malla[i][j].setIcon(null);
+                    malla[i][j].repaint();
+                }
+            }
+        }
     }
     public static void main(String[] args) {
         DamasGUI gui = new DamasGUI();

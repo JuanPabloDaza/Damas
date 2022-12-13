@@ -1,6 +1,8 @@
 package domain;
 
-public abstract class Comodin {
+import java.io.Serializable;
+
+public abstract class Comodin implements Serializable {
     int posicionX;
     int posicionY;
 
